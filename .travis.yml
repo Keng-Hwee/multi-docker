@@ -8,7 +8,7 @@ before_install:
 script:
   - docker run kh94/react-test npm test -- --coverage
 
-# Build using production dockerfiles
+# Build using the production dockerfiles
 after_success:
   - docker build -t kh94/multi-client ./client
   - docker build -t kh94/multi-nginx ./nginx
