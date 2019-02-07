@@ -1,0 +1,26 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  # Look into the client directory to get build context (where all the files are found)
+  - docker build -t kh94/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run kh94/react-test npm test -- --coverage
+
+# Build using production dockerfiles
+after_success:
+  - docker build -t kh94/multi-client ./client
+  - docker build -t kh94/multi-nginx ./nginx
+  - docker build -t kh94/multi-server ./server
+  - docker build -t kh94/multi-worker ./worker
+
+# Login to the docker CLI
+# Take the docker password and add it into the std-in channel of the login part
+- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+# Push images to docker hub
+- docker push kh94/multi-client
+- docker push kh94/multi-nginx
+- docker push kh94/multi-server
+- docker push kh94/multi-worker
